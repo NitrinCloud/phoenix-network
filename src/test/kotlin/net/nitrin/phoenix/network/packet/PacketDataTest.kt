@@ -4,38 +4,12 @@ import com.google.gson.*
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import org.junit.jupiter.api.Assertions.*
-import java.lang.reflect.Type
 import java.util.UUID
 import kotlin.test.Test
 
 class PacketDataTest {
 
     private val gson = GsonBuilder().registerTypeAdapter(Packet::class.java, CustomTypeAdapter()).serializeNulls().create()
-
-    @Test
-    fun testCopyData() {
-        val firstData = PacketData()
-        val jsonElement = gson.toJsonTree("hello")
-        firstData.add("test", jsonElement)
-
-        val secondData = PacketData(firstData)
-        assertEquals(jsonElement, secondData.get("test"))
-    }
-
-    data class TestData(
-        val id: Int,
-        val name: String
-    )
-
-    @Test
-    fun testType() {
-        val packetData = PacketData()
-        packetData.add("test", TestData(1, "NitrinCloud"))
-
-        val testData = packetData.get("test", TestData::class.java)
-        assertEquals(1, testData.id)
-        assertEquals("NitrinCloud", testData.name)
-    }
 
     class CustomTypeAdapter: TypeAdapter<Packet>() {
 

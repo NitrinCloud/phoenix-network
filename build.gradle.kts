@@ -1,10 +1,13 @@
 plugins {
     kotlin("jvm") version "1.8.21"
-    application
+
+    `java-library`
+    `maven-publish`
 }
 
 group = "net.nitrin.phoenix"
-version = "1.0-SNAPSHOT"
+version = project.property("version")
+    ?: "-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -14,10 +17,10 @@ dependencies {
     testImplementation(kotlin("test"))
 
     // https://mvnrepository.com/artifact/io.netty/netty-all
-    implementation("io.netty:netty-all:4.1.93.Final")
+    api("io.netty:netty-all:${project.property("netty.version")}")
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation("com.google.code.gson:gson:2.10.1")
+    api("com.google.code.gson:gson:${project.property("gson.version")}")
 }
 
 tasks.test {
@@ -28,6 +31,20 @@ kotlin {
     jvmToolchain(17)
 }
 
-application {
-    mainClass.set("MainKt")
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/NitrinCloud/phoenix-network")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+            }
+        }
+    }
+    publications {
+        register<MavenPublication>("gpr") {
+            from(components["java"])
+        }
+    }
 }
