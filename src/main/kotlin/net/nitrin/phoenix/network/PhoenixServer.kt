@@ -2,19 +2,16 @@ package net.nitrin.phoenix.network
 
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.Channel
-import io.netty.channel.ChannelInitializer
 import io.netty.channel.EventLoopGroup
 import net.nitrin.phoenix.network.packet.PacketManager
-import net.nitrin.phoenix.network.packet.channel.PacketChannel
 import net.nitrin.phoenix.network.packet.channel.PacketChannelFactory
-import net.nitrin.phoenix.network.packet.channel.PacketChannelInboundHandler
 import net.nitrin.phoenix.network.packet.channel.initializer.MultiPacketChannelInitializer
 import java.net.SocketAddress
 import java.util.concurrent.TimeUnit
 
 class PhoenixServer(
-    private val packetManager: PacketManager,
-    private val packetChannelFactory: PacketChannelFactory
+    packetManager: PacketManager,
+    packetChannelFactory: PacketChannelFactory
 ) {
 
     private val serverBootstrap = ServerBootstrap()

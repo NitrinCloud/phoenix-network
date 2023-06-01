@@ -2,12 +2,9 @@ package net.nitrin.phoenix.network
 
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.Channel
-import io.netty.channel.ChannelInitializer
 import io.netty.channel.EventLoopGroup
 import net.nitrin.phoenix.network.packet.PacketManager
 import net.nitrin.phoenix.network.packet.channel.AbstractPacketChannel
-import net.nitrin.phoenix.network.packet.channel.PacketChannel
-import net.nitrin.phoenix.network.packet.channel.PacketChannelInboundHandler
 import net.nitrin.phoenix.network.packet.channel.initializer.SinglePacketChannelInitializer
 import java.net.SocketAddress
 import java.util.concurrent.TimeUnit
