@@ -2,7 +2,6 @@
 
 package net.nitrin.phoenix.network.packet
 
-import net.nitrin.phoenix.network.Future
 import net.nitrin.phoenix.network.packet.idle.PingPacket
 import net.nitrin.phoenix.network.packet.idle.PingPacketListener
 import java.util.*
@@ -31,8 +30,8 @@ class PacketManager {
             ?: listOf()) as List<PacketListener<T>>
     }
 
-    fun <T: Packet> createFuture(uuid: UUID): Future<T> {
-        val future = Future<T>()
+    fun <T: Packet> createFuture(uuid: UUID): CompletableFuture<T> {
+        val future = CompletableFuture<T>()
         queries[uuid] = future
         return future
     }
