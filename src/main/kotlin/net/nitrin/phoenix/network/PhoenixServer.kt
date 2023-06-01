@@ -4,6 +4,8 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.Channel
 import io.netty.channel.EventLoopGroup
 import net.nitrin.phoenix.network.packet.PacketManager
+import net.nitrin.phoenix.network.packet.channel.ConnectionState
+import net.nitrin.phoenix.network.packet.channel.PacketChannel
 import net.nitrin.phoenix.network.packet.channel.PacketChannelFactory
 import net.nitrin.phoenix.network.packet.channel.initializer.MultiPacketChannelInitializer
 import java.net.SocketAddress
@@ -11,7 +13,8 @@ import java.util.concurrent.TimeUnit
 
 class PhoenixServer(
     packetManager: PacketManager,
-    packetChannelFactory: PacketChannelFactory
+    packetChannelFactory: PacketChannelFactory,
+    hook: ((ConnectionState, PacketChannel, Throwable?) -> Unit)?,
 ) {
 
     private val serverBootstrap = ServerBootstrap()
@@ -23,7 +26,7 @@ class PhoenixServer(
 
     init {
         serverBootstrap.channel(NetworkUtils.serverSocketChannel())
-        serverBootstrap.childHandler(MultiPacketChannelInitializer(packetManager, packetChannelFactory))
+        serverBootstrap.childHandler(MultiPacketChannelInitializer(packetManager, packetChannelFactory, hook))
     }
 
     fun bind(socketAddress: SocketAddress, timeout: Long = 1000, unit: TimeUnit = TimeUnit.MILLISECONDS): Channel {

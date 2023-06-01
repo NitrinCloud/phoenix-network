@@ -5,12 +5,15 @@ import io.netty.channel.Channel
 import io.netty.channel.EventLoopGroup
 import net.nitrin.phoenix.network.packet.PacketManager
 import net.nitrin.phoenix.network.packet.channel.AbstractPacketChannel
+import net.nitrin.phoenix.network.packet.channel.ConnectionState
+import net.nitrin.phoenix.network.packet.channel.PacketChannel
 import net.nitrin.phoenix.network.packet.channel.initializer.SinglePacketChannelInitializer
 import java.net.SocketAddress
 import java.util.concurrent.TimeUnit
 
 class PhoenixClient(
-    packetManager: PacketManager
+    packetManager: PacketManager,
+    hook: ((ConnectionState, PacketChannel, Throwable?) -> Unit)?,
 ): AbstractPacketChannel(packetManager) {
 
     private val bootstrap = Bootstrap()
@@ -21,7 +24,7 @@ class PhoenixClient(
 
     init {
         bootstrap.channel(NetworkUtils.socketChannel())
-        bootstrap.handler(SinglePacketChannelInitializer(packetManager, this))
+        bootstrap.handler(SinglePacketChannelInitializer(packetManager, this, hook))
     }
 
     fun connect(socketAddress: SocketAddress, timeout: Long = 1000, unit: TimeUnit = TimeUnit.MILLISECONDS): Channel {
