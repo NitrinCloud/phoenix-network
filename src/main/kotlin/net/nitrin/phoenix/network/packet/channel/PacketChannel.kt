@@ -2,10 +2,10 @@ package net.nitrin.phoenix.network.packet.channel
 
 import io.netty.channel.Channel
 import io.netty.util.AttributeKey
+import net.nitrin.phoenix.network.Future
 import net.nitrin.phoenix.network.packet.Packet
 import net.nitrin.phoenix.network.packet.QueryPacket
 import java.util.UUID
-import java.util.concurrent.CompletionStage
 
 sealed interface PacketChannel {
     companion object {
@@ -24,7 +24,7 @@ sealed interface PacketChannel {
 
     fun sendPacket(packet: Packet, uuid: UUID? = null)
 
-    fun <T: Packet> sendQuery(packet: QueryPacket<T>): CompletionStage<T>
+    fun <T: Packet> sendQuery(packet: QueryPacket<T>): Future<T>
 
     fun getChannel(): Channel
 }
