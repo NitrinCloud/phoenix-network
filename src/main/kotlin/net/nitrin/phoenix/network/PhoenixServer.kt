@@ -9,6 +9,7 @@ import net.nitrin.phoenix.network.packet.channel.PacketChannel
 import net.nitrin.phoenix.network.packet.channel.PacketChannelFactory
 import net.nitrin.phoenix.network.packet.channel.initializer.MultiPacketChannelInitializer
 import java.net.SocketAddress
+import java.util.Collections
 import java.util.concurrent.TimeUnit
 
 class PhoenixServer(
@@ -24,9 +25,18 @@ class PhoenixServer(
 
     private var currentChannel: Channel? = null
 
+    private val connectedChannels: MutableList<Channel> = Collections.synchronizedList(mutableListOf())
+
     init {
         serverBootstrap.channel(NetworkUtils.serverSocketChannel())
-        serverBootstrap.childHandler(MultiPacketChannelInitializer(packetManager, packetChannelFactory, hook))
+        serverBootstrap.childHandler(MultiPacketChannelInitializer(packetManager, packetChannelFactory) { connectionState, packetChannel, throwable ->
+            when (connectionState) {
+                ConnectionState.CONNECT -> connectedChannels.add(packetChannel.getChannel())
+                ConnectionState.CONNECTED -> { }
+                ConnectionState.DISCONNECT -> connectedChannels.remove(packetChannel.getChannel())
+            }
+            hook?.invoke(connectionState, packetChannel, throwable)
+        })
     }
 
     fun bind(socketAddress: SocketAddress, timeout: Long = 1000, unit: TimeUnit = TimeUnit.MILLISECONDS): Channel {
@@ -59,5 +69,9 @@ class PhoenixServer(
     fun getChannel(): Channel {
         return currentChannel
             ?: throw RuntimeException("Server not yet bound")
+    }
+
+    fun getConnectedChannels(): List<Channel> {
+        return connectedChannels
     }
 }
