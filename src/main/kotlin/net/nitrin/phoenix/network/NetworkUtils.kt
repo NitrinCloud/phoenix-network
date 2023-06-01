@@ -19,6 +19,7 @@ import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.channel.socket.nio.NioSocketChannel
 import io.netty.handler.timeout.IdleStateHandler
+import io.netty.util.concurrent.DefaultThreadFactory
 import net.nitrin.phoenix.network.codec.VariableLengthDecoder
 import net.nitrin.phoenix.network.codec.VariableLengthEncoder
 import net.nitrin.phoenix.network.codec.packet.PacketDecoder
@@ -29,6 +30,8 @@ import net.nitrin.phoenix.network.packet.idle.IdleHandler
 import java.lang.reflect.Type
 
 object NetworkUtils {
+
+    private val defaultThreadFactory = DefaultThreadFactory("phoenix-network")
 
     private var gsonBuilder = GsonBuilder()
         .serializeNulls()
@@ -56,11 +59,11 @@ object NetworkUtils {
 
     fun newEventLoopGroup(): EventLoopGroup {
         return if (Epoll.isAvailable()) {
-            EpollEventLoopGroup()
+            EpollEventLoopGroup(defaultThreadFactory)
         } else if (KQueue.isAvailable()) {
-            KQueueEventLoopGroup()
+            KQueueEventLoopGroup(defaultThreadFactory)
         } else {
-            NioEventLoopGroup()
+            NioEventLoopGroup(defaultThreadFactory)
         }
     }
 
