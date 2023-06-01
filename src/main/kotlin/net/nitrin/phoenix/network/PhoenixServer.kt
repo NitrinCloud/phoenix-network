@@ -48,7 +48,7 @@ class PhoenixServer(
         channelFuture.awaitUninterruptibly(timeout, unit)
 
         if (!channelFuture.isSuccess) {
-            throw RuntimeException("Cannot bind server to port address: $socketAddress")
+            throw RuntimeException("Cannot bind server to address: $socketAddress")
         }
         val channel = channelFuture.channel()
         val closeFuture = channel.closeFuture()
