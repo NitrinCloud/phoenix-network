@@ -41,7 +41,7 @@ class PacketManager {
     }
 
     fun <T: Packet> tryCompleteFuture(uuid: UUID?, packet: T): Boolean {
-        val future = (queries[uuid]
+        val future = (queries.remove(uuid)
             ?: return false) as CompletableFuture<T>
         future.complete(packet)
         return true
