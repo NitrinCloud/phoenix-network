@@ -9,6 +9,10 @@ class Future<T: Any>(
 
     constructor(): this(null)
 
+    override fun <U : Any> newIncompleteFuture(): CompletableFuture<U> {
+        return Future()
+    }
+
     override fun defaultExecutor(): Executor {
         return defaultExecutor
             ?: super.defaultExecutor()
