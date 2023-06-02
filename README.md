@@ -68,7 +68,7 @@ val socketAddress = InetSocketAddress("127.0.0.1", 8888)
 val packetManager = PacketManager()
 val phoenixClient = PhoenixClient(packetManager) { connectionState, packetChannel, throwable -> }
 
-phoenixClient.conntect(socketAddress)
+phoenixClient.connect(socketAddress)
 phoenixClient.sendPacket(TestPacket("TestName"))
 phoenixClient.sendQuery(TestQueryPacket("TestQuery")).thenAcceptAsync { packet ->
     println(packet.size)
