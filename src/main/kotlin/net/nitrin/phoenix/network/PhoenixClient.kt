@@ -12,7 +12,7 @@ import java.net.SocketAddress
 import java.util.concurrent.TimeUnit
 
 class PhoenixClient(
-    packetManager: PacketManager,
+    private val packetManager: PacketManager,
     hook: ((ConnectionState, PacketChannel, Throwable?) -> Unit)?,
 ): AbstractPacketChannel(packetManager) {
 
@@ -30,6 +30,8 @@ class PhoenixClient(
     fun connect(socketAddress: SocketAddress, timeout: Long = 1000, unit: TimeUnit = TimeUnit.MILLISECONDS): Channel {
         workerGroup = NetworkUtils.newEventLoopGroup()
         bootstrap.group(workerGroup)
+
+        packetManager.setExecutor(workerGroup)
 
         val channelFuture = bootstrap.connect(socketAddress)
         channelFuture.awaitUninterruptibly(timeout, unit)

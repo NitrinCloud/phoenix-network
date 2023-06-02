@@ -13,7 +13,7 @@ import java.util.Collections
 import java.util.concurrent.TimeUnit
 
 class PhoenixServer(
-    packetManager: PacketManager,
+    private val packetManager: PacketManager,
     packetChannelFactory: PacketChannelFactory,
     hook: ((ConnectionState, PacketChannel, Throwable?) -> Unit)?,
 ) {
@@ -43,6 +43,8 @@ class PhoenixServer(
         bossGroup = NetworkUtils.newEventLoopGroup()
         workerGroup = NetworkUtils.newEventLoopGroup()
         serverBootstrap.group(bossGroup, workerGroup)
+
+        packetManager.setExecutor(workerGroup)
 
         val channelFuture = serverBootstrap.bind(socketAddress)
         channelFuture.awaitUninterruptibly(timeout, unit)

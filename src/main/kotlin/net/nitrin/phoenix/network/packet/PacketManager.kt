@@ -2,15 +2,19 @@
 
 package net.nitrin.phoenix.network.packet
 
+import net.nitrin.phoenix.network.Future
 import net.nitrin.phoenix.network.packet.idle.PingPacket
 import net.nitrin.phoenix.network.packet.idle.PingPacketListener
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executor
 
 class PacketManager {
 
     private val queries: MutableMap<UUID, CompletableFuture<out Packet>> = Collections.synchronizedMap(mutableMapOf())
     private val listeners: MutableMap<Class<out Packet>, MutableList<PacketListener<out Packet>>> = mutableMapOf()
+
+    private var executor: Executor? = null
 
     init {
         registerListener(PingPacket::class.java, PingPacketListener())
@@ -31,7 +35,7 @@ class PacketManager {
     }
 
     fun <T: Packet> createFuture(uuid: UUID): CompletableFuture<T> {
-        val future = CompletableFuture<T>()
+        val future = Future<T>(executor)
         queries[uuid] = future
         return future
     }
@@ -41,5 +45,9 @@ class PacketManager {
             ?: return false) as CompletableFuture<T>
         future.complete(packet)
         return true
+    }
+
+    fun setExecutor(executor: Executor?) {
+        this.executor = executor
     }
 }
