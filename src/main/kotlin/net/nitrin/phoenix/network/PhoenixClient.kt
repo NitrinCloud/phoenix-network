@@ -34,9 +34,8 @@ class PhoenixClient(
         packetManager.setExecutor(workerGroup)
 
         val channelFuture = bootstrap.connect(socketAddress)
-        channelFuture.awaitUninterruptibly(timeout, unit)
 
-        if (!channelFuture.isSuccess) {
+        if (!channelFuture.awaitUninterruptibly(timeout, unit)) {
             throw RuntimeException("Cannot connect to server: $socketAddress")
         }
         val channel = channelFuture.channel()
