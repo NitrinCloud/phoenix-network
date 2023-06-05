@@ -49,7 +49,7 @@ class PhoenixClient(
         return channel
     }
 
-    fun isBound(): Boolean {
+    fun isConnected(): Boolean {
         return (currentChannel?.isActive ?: false) && (!(workerGroup?.isShutdown ?: true))
     }
 
