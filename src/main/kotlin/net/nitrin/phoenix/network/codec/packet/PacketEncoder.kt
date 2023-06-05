@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToByteEncoder
 import net.nitrin.phoenix.network.NetworkUtils
+import net.nitrin.phoenix.network.NetworkUtils.writeString
 import net.nitrin.phoenix.network.packet.PacketFrame
 
 class PacketEncoder: MessageToByteEncoder<PacketFrame>() {
@@ -12,9 +13,6 @@ class PacketEncoder: MessageToByteEncoder<PacketFrame>() {
         val gson = NetworkUtils.createGson()
         val json = gson.toJson(frame)
 
-        val bytes = json.toByteArray()
-
-        output.writeInt(bytes.size)
-        output.writeBytes(bytes)
+        output.writeString(json)
     }
 }

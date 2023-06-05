@@ -2,6 +2,7 @@ package net.nitrin.phoenix.network
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import io.netty.buffer.ByteBuf
 import io.netty.channel.Channel
 import io.netty.channel.ChannelPipeline
 import io.netty.channel.EventLoopGroup
@@ -28,6 +29,7 @@ import net.nitrin.phoenix.network.packet.Packet
 import net.nitrin.phoenix.network.codec.PacketTypeAdapter
 import net.nitrin.phoenix.network.packet.idle.IdleHandler
 import java.lang.reflect.Type
+import kotlin.experimental.and
 
 object NetworkUtils {
 
@@ -83,5 +85,56 @@ object NetworkUtils {
 
     fun createGson(): Gson {
         return gsonBuilder.create()
+    }
+
+    private const val SEGMENT_BITS = 0x7F
+    private const val CONTINUE_BIT = 0x80
+
+    fun ByteBuf.readVarIntOrNull(): Int? {
+        var value = 0
+        var position = 0
+        var currentByte: Int
+
+        while (true) {
+            currentByte = readByte().toInt()
+            value = value.or(currentByte.and(SEGMENT_BITS).shl(position))
+
+            if (currentByte.and(CONTINUE_BIT) == 0) break
+
+            position += 7
+
+            if (position >= 32) return null
+        }
+        return value
+    }
+
+    fun ByteBuf.readVarInt(): Int {
+        return readVarIntOrNull()
+            ?: throw RuntimeException("VarInt too big")
+    }
+
+    fun ByteBuf.writeVarInt(value: Int) {
+        var newValue = value
+        while (true) {
+            if (newValue.and(SEGMENT_BITS.inv()) == 0) {
+                writeByte(newValue)
+                return
+            }
+            writeByte(newValue.and(SEGMENT_BITS).or(CONTINUE_BIT))
+            newValue = newValue.ushr(7)
+        }
+    }
+
+    fun ByteBuf.readString(): String {
+        val size = readVarInt()
+        val bytes = ByteArray(size)
+        readBytes(bytes)
+        return String(bytes)
+    }
+
+    fun ByteBuf.writeString(value: String) {
+        val bytes = value.toByteArray()
+        writeVarInt(bytes.size)
+        writeBytes(bytes)
     }
 }
