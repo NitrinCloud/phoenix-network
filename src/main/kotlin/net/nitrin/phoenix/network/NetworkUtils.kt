@@ -29,7 +29,6 @@ import net.nitrin.phoenix.network.packet.Packet
 import net.nitrin.phoenix.network.codec.PacketTypeAdapter
 import net.nitrin.phoenix.network.packet.idle.IdleHandler
 import java.lang.reflect.Type
-import kotlin.experimental.and
 
 object NetworkUtils {
 
